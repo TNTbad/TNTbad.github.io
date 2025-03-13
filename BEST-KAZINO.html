@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Казино Аристарха</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-image: url('D:\photo_5375124379962303597_y.ico');
+            background-size: cover;
+            background-position: center;
+        }
+        h1 {
+            color: #fff;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        .slot-machine {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .reel {
+            width: 100px;
+            height: 100px;
+            border: 2px solid #333;
+            margin: 0 10px;
+            font-size: 50px;
+            line-height: 100px;
+            text-align: center;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .spin-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 18px;
+            cursor: pointer;
+            background-color: #ff0404;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        .spin-button:hover {
+            background-color: #45a049;
+        }
+        .result {
+            margin-top: 20px;
+            font-size: 24px;
+            color: #fff;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        @keyframes fall {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100vh); }
+        }
+        .money-fall {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+        }
+        .money-fall span {
+            position: absolute;
+            font-size: 24px;
+            color: gold;
+            animation: fall 2s linear infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>Казино Аристарха</h1>
+        <div class="slot-machine">
+            <div class="reel" id="reel1">7</div>
+            <div class="reel" id="reel2">7</div>
+            <div class="reel" id="reel3">7</div>
+        </div>
+        <button class="spin-button" onclick="spin()">Крутить</button>
+        <div class="result" id="result"></div>
+    </div>
+
+    <div class="money-fall" id="money-fall"></div>
+
+    <script>
+        const symbols = ['7', '🍒', '🍋', '🍇', '💸', '⭐'];
+        const reels = [document.getElementById('reel1'), document.getElementById('reel2'), document.getElementById('reel3')];
+        const resultDiv = document.getElementById('result');
+        const moneyFallDiv = document.getElementById('money-fall');
+
+        function getRandomSymbol() {
+            return symbols[Math.floor(Math.random() * symbols.length)];
+        }
+
+        function spin() {
+            resultDiv.textContent = '';
+            moneyFallDiv.innerHTML = '';
+            let spins = 0;
+            const spinInterval = setInterval(() => {
+                reels.forEach(reel => {
+                    reel.textContent = getRandomSymbol();
+                });
+                spins++;
+                if (spins >= 20) {
+                    clearInterval(spinInterval);
+                    checkResult();
+                }
+            }, 100);
+        }
+
+        function checkResult() {
+            const [reel1, reel2, reel3] = reels.map(reel => reel.textContent);
+
+            if (reel1 === reel2 && reel2 === reel3) {
+                resultDiv.textContent = 'Поздравляем! Вы выиграли Аристарха!';
+                startMoneyFall();
+            } else {
+                resultDiv.textContent = 'Ну ты и лох!';
+            }
+        }
+
+        function startMoneyFall() {
+            for (let i = 0; i < 50; i++) {
+                const money = document.createElement('span');
+                money.textContent = '💰';
+                money.style.left = `${Math.random() * 100}vw`;
+                money.style.animationDelay = `${Math.random() * 2}s`;
+                moneyFallDiv.appendChild(money);
+            }
+        }
+    </script>
+</body>
+</html>
