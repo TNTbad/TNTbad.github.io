@@ -1,188 +1,219 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>2D Minecraft TNT Game</title>
+    <title>Смешарики: Война Коротышек</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <style>
-        body { 
-            margin: 0; 
-            overflow: hidden; 
-            background: #8B8B8B; 
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: #4a752c;
             font-family: Arial, sans-serif;
+            touch-action: manipulation;
         }
-        canvas { 
-            display: block; 
-            background: #7EC850; 
+        #gameCanvas {
+            display: block;
             margin: 0 auto;
+            background: #7ec850;
         }
-        #info {
+        #ui {
+            position: fixed;
+            bottom: 10px;
+            width: 100%;
             text-align: center;
-            padding: 10px;
+        }
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 5px;
+            background: #ff6b00;
             color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            user-select: none;
+        }
+        #player1UI { left: 10px; }
+        #player2UI { right: 10px; }
+        .unit-btn {
+            width: 50px;
+            height: 50px;
+            margin: 5px;
+            background-size: cover;
         }
     </style>
 </head>
 <body>
-    <div id="info">
-        <h1>2D Minecraft TNT</h1>
-        <p>Управление: Стрелки (движение), Пробел (бросить TNT)</p>
-    </div>
     <canvas id="gameCanvas" width="800" height="600"></canvas>
+    
+    <div id="ui">
+        <button class="btn" id="joinBtn">Подключиться</button>
+        <button class="btn" id="startBtn">Начать игру</button>
+    </div>
+
+    <div id="player1UI" style="position: fixed; bottom: 80px; left: 10px;">
+        <button class="unit-btn" style="background-image: url('https://i.imgur.com/krosh.png')" data-unit="krosh"></button>
+        <button class="unit-btn" style="background-image: url('https://i.imgur.com/nyusha.png')" data-unit="nyusha"></button>
+        <button class="btn" id="nukeBtn">Ядерная бомба</button>
+    </div>
 
     <script>
         // Инициализация игры
         const canvas = document.getElementById("gameCanvas");
         const ctx = canvas.getContext("2d");
+        
+        // Масштабирование для мобильных
+        function resizeCanvas() {
+            const scale = Math.min(
+                window.innerWidth / 800,
+                window.innerHeight / 600
+            );
+            canvas.style.width = (800 * scale) + "px";
+            canvas.style.height = (600 * scale) + "px";
+        }
+        window.addEventListener("resize", resizeCanvas);
+        resizeCanvas();
 
-        // Игрок
-        const player = {
-            x: 50,
-            y: 500,
-            width: 40,
-            height: 60,
-            color: "#4B8BBE",
-            speed: 5
-        };
-
-        // TNT и взрывы
-        const tnts = [];
+        // Игровые объекты
+        const players = {};
+        const units = [];
+        const bullets = [];
         const explosions = [];
-        const blocks = [];
-
-        // Создаем блоки (как в Minecraft)
-        for (let i = 0; i < 20; i++) {
-            blocks.push({
-                x: Math.random() * (canvas.width - 50),
-                y: Math.random() * (canvas.height - 100) + 50,
-                width: 40,
-                height: 40,
-                color: "#8B4513"
-            });
-        }
-
-        // Управление
-        const keys = {
-            left: false,
-            right: false,
-            up: false,
-            down: false
+        const resources = [];
+        
+        // Игрок 1 (локальный)
+        const player1 = {
+            id: "player1",
+            x: 100,
+            y: 300,
+            color: "#FF0000",
+            resources: 1000,
+            baseHealth: 1000
         };
-
-        // Обработка клавиш
-        document.addEventListener("keydown", (e) => {
-            if (e.key === "ArrowLeft") keys.left = true;
-            if (e.key === "ArrowRight") keys.right = true;
-            if (e.key === "ArrowUp") keys.up = true;
-            if (e.key === "ArrowDown") keys.down = true;
-            if (e.key === " ") throwTNT();
+        
+        // Игрок 2 (удаленный)
+        const player2 = {
+            id: "player2",
+            x: 700,
+            y: 300,
+            color: "#0000FF",
+            resources: 1000,
+            baseHealth: 1000
+        };
+        
+        // Сетевой модуль (упрощенный WebSocket)
+        let socket;
+        let isHost = false;
+        
+        document.getElementById("joinBtn").addEventListener("click", () => {
+            alert("Подключение к игре... (в реальной игре здесь был бы WebSocket)");
+            socket = { send: (data) => console.log("Отправлено:", data) };
+            simulateMultiplayer();
         });
-
-        document.addEventListener("keyup", (e) => {
-            if (e.key === "ArrowLeft") keys.left = false;
-            if (e.key === "ArrowRight") keys.right = false;
-            if (e.key === "ArrowUp") keys.up = false;
-            if (e.key === "ArrowDown") keys.down = false;
+        
+        document.getElementById("startBtn").addEventListener("click", () => {
+            alert("Создание игры... (в реальной игре здесь был бы сервер)");
+            isHost = true;
+            socket = { send: (data) => console.log("Отправлено:", data) };
+            simulateMultiplayer();
         });
-
-        // Бросок TNT
-        function throwTNT() {
-            tnts.push({
-                x: player.x + player.width / 2,
-                y: player.y,
-                width: 20,
-                height: 20,
-                color: "#FF0000",
-                speedY: -10,
-                speedX: (Math.random() - 0.5) * 5,
-                fuse: 100
-            });
-        }
-
-        // Взрыв TNT
-        function explodeTNT(tnt) {
-            explosions.push({
-                x: tnt.x,
-                y: tnt.y,
-                radius: 0,
-                maxRadius: 80,
-                color: "#FF4500"
-            });
-
-            // Уничтожение блоков
-            for (let i = blocks.length - 1; i >= 0; i--) {
-                const block = blocks[i];
-                const dist = Math.sqrt(
-                    Math.pow(block.x + block.width / 2 - tnt.x, 2) +
-                    Math.pow(block.y + block.height / 2 - tnt.y, 2)
-                );
-                if (dist < 80) {
-                    blocks.splice(i, 1);
+        
+        // Симуляция мультиплеера (для демо)
+        function simulateMultiplayer() {
+            setInterval(() => {
+                if (isHost) {
+                    // Хост обновляет состояние игры
+                    updateGame();
+                    socket.send(JSON.stringify({ type: "gameState",data: { units, bullets, explosions } }));
                 }
-            }
+            }, 1000 / 30);
         }
-
+        
+        // Создание юнитов
+        document.querySelectorAll(".unit-btn").forEach(btn => {
+            btn.addEventListener("click", () => {
+                if (player1.resources >= 100) {
+                    player1.resources -= 100;
+                    const unitType = btn.getAttribute("data-unit");
+                    units.push({
+                        x: player1.x,
+                        y: player1.y,
+                        owner: "player1",
+                        type: unitType,
+                        health: 100,
+                        target: { x: player2.x, y: player2.y }
+                    });
+                }
+            });
+        });
+        
+        // Ядерная бомба
+        document.getElementById("nukeBtn").addEventListener("click", () => {
+            if (player1.resources >= 500) {
+                player1.resources -= 500;
+                explosions.push({
+                    x: player2.x,
+                    y: player2.y,
+                    radius: 0,
+                    maxRadius: 200,
+                    damage: 500
+                });
+            }
+        });
+        
         // Игровой цикл
         function gameLoop() {
-            // Очистка экрана
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            // Движение игрока
-            if (keys.left) player.x -= player.speed;
-            if (keys.right) player.x += player.speed;
-            if (keys.up) player.y -= player.speed;
-            if (keys.down) player.y += player.speed;
-
-            // Границы экрана
-            player.x = Math.max(0, Math.min(canvas.width - player.width, player.x));
-            player.y = Math.max(0, Math.min(canvas.height - player.height, player.y));
-
-            // Рисуем игрока
-            ctx.fillStyle = player.color;
-            ctx.fillRect(player.x, player.y, player.width,player.height);
-
-            // Рисуем блоки
-            blocks.forEach(block => {
-                ctx.fillStyle = block.color;
-                ctx.fillRect(block.x, block.y, block.width, block.height);
-            });
-
-            // Обновляем TNT
-            for (let i = tnts.length - 1; i >= 0; i--) {
-                const tnt = tnts[i];
-                tnt.y += tnt.speedY;
-                tnt.x += tnt.speedX;
-                tnt.speedY += 0.3;
-                tnt.fuse--;
-
-                ctx.fillStyle = tnt.color;
-                ctx.fillRect(tnt.x, tnt.y, tnt.width, tnt.height);
-
-                // Взрыв
-                if (tnt.fuse <= 0 || tnt.y > canvas.height) {
-                    explodeTNT(tnt);
-                    tnts.splice(i, 1);
-                }
-            }
-
-            // Рисуем взрывы
-            for (let i = explosions.length - 1; i >= 0; i--) {
-                const explosion = explosions[i];
-                explosion.radius += 2;
-
+            
+            // Рисуем базы
+            drawBase(player1);
+            drawBase(player2);
+            
+            // Рисуем юнитов
+            units.forEach(unit => {
+                ctx.fillStyle = unit.owner === "player1" ? "#FF0000" : "#0000FF";
                 ctx.beginPath();
-                ctx.arc(explosion.x, explosion.y, explosion.radius, 0, Math.PI * 2);
-                ctx.fillStyle = explosion.color;
-                ctx.globalAlpha = 1 - (explosion.radius / explosion.maxRadius);
+                ctx.arc(unit.x, unit.y, 20, 0, Math.PI * 2);
                 ctx.fill();
-                ctx.globalAlpha = 1;
-
-                if (explosion.radius >= explosion.maxRadius) {
-                    explosions.splice(i, 1);
+                
+                // Движение к цели
+                const dx = unit.target.x - unit.x;
+                const dy = unit.target.y - unit.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist > 10) {
+                    unit.x += dx / dist * 2;
+                    unit.y += dy / dist * 2;
                 }
-            }
-
+            });
+            
+            // Рисуем взрывы
+            explosions.forEach(exp => {
+                exp.radius += 5;
+                ctx.fillStyle = rgba(255, 100, 0, ${1 - exp.radius / exp.maxRadius});
+                ctx.beginPath();
+                ctx.arc(exp.x, exp.y, exp.radius, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Нанесение урона
+                if (exp.radius >= exp.maxRadius) {
+                    explosions.splice(explosions.indexOf(exp), 1);
+                }
+            });
+            
             requestAnimationFrame(gameLoop);
         }
-
+        
+        function drawBase(player) {
+            ctx.fillStyle = player.color;
+            ctx.fillRect(player.x - 50, player.y - 50, 100, 100);
+            
+            // Здоровье базы
+            ctx.fillStyle = "#000000";
+            ctx.fillText(`База: ${player.baseHealth}`, player.x - 40, player.y - 60);
+        }
+        
         // Запуск игры
         gameLoop();
     </script>
