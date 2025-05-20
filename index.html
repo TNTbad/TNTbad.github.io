@@ -1,180 +1,122 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
-    <title>Смешарики: Война</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Школа 80 — Биржа рабов</title>
     <style>
-        body { margin: 0; padding: 0; overflow: hidden; background: #4a752c; font-family: Arial; }
-        #gameCanvas { display: block; margin: 0 auto; background: #7ec850; touch-action: manipulation; }
-        #ui { position: fixed; bottom: 10px; width: 100%; text-align: center; }
-        .btn { padding: 12px 24px; margin: 5px; background: #ff6b00; color: white; border: none; border-radius: 8px; font-size: 16px; }
-        .unit-btn { width: 60px; height: 60px; margin: 5px; border-radius: 50%; background-size: cover; border: 2px solid white; }
-        #gameId { padding: 10px; font-size: 18px; width: 150px; text-align: center; }
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background-color: #f0f8ff;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+        header {
+            background-color: #ff6b6b;
+            color: white;
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .friend-card {
+            background: white;
+            border: 2px dashed #ff6b6b;
+            border-radius: 15px;
+            padding: 15px;
+            margin: 10px;
+            width: 250px;
+            display: inline-block;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .friend-img {
+            width: 200px;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 3px solid #ff6b6b;
+        }
+        .buy-btn {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .buy-btn:hover {
+            background: #ff4757;
+        }
+        footer {
+            margin-top: 30px;
+            font-size: 12px;
+            color: gray;
+        }
     </style>
-    <!-- Firebase для мультиплеера -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 </head>
 <body>
-    <canvas id="gameCanvas" width="800" height="600"></canvas>
-    
-    <div id="ui">
-        <input type="text" id="gameId" placeholder="ID игры">
-        <button class="btn" id="createBtn">Создать игру</button>
-        <button class="btn" id="joinBtn">Присоединиться</button>
+    <header>
+        <h1>🛒 School 80 — Магазин рабов 🛒</h1>
+        <p>«Более 1000 человек уже воспользовались нашим сервисом»</p>
+    </header>
+
+    <div id="friends-container">
+        <!-- Друг 1 -->
+        <div class="friend-card">
+            <!-- ВСТАВЬ ССЫЛКУ НА ФОТО -->
+            <img src="https://ibb.co/bjHnG3YX" class="friend-img" alt="Друг 1">
+            <h3>👑 Король мемов 👑</h3>
+            <p><strong>Характеристики:</strong></p>
+            <ul style="text-align: left;">
+                <li>Шутит 24/7 (даже невпопад)</li>
+                <li>Знает все тренды TikTok</li>
+                <li>Круто срёт</li>
+            </ul>
+            <button class="buy-btn">Купить за 999 ₽</button>
+        </div>
+
+        <!-- Друг 2 -->
+        <div class="friend-card">
+            <!-- ВСТАВЬ ССЫЛКУ НА ФОТО -->
+            <img src="https://via.placeholder.com/200" class="friend-img" alt="Друг 2">
+            <h3>☕ Кофейный наркоман ☕</h3>
+            <p><strong>Характеристики:</strong></p>
+            <ul style="text-align: left;">
+                <li>Будит вас в 6 утра ради латте</li>
+                <li>Знает все кофейни в радиусе 100 км</li>
+                <li>Говорит «Это не зависимость, это любовь»</li>
+            </ul>
+            <button class="buy-btn">Купить за 799 ₽</button>
+        </div>
+
+        <!-- Друг 3 -->
+        <div class="friend-card">
+            <!-- ВСТАВЬ ССЫЛКУ НА ФОТО -->
+            <img src="https://via.placeholder.com/200" class="friend-img" alt="Друг 3">
+            <h3>🎮 Геймер-полуночник 🎮</h3>
+            <p><strong>Характеристики:</strong></p>
+            <ul style="text-align: left;">
+                <li>Играет в 5 играх одновременно</li>
+                <li>Кричит в микрофон в 3 часа ночи</li>
+                <li>Говорит «Ещё один раунд!» уже 6 часов</li>
+            </ul>
+            <button class="buy-btn">Купить за 1299 ₽</button>
+        </div>
     </div>
 
-    <div style="position: fixed; bottom: 100px; left: 10px;">
-        <button class="unit-btn" style="background-color: #FF5722;" data-unit="krosh">Крош</button>
-        <button class="unit-btn" style="background-color: #E91E63;" data-unit="nyusha">Нюша</button>
-        <button class="btn" id="nukeBtn" style="background: #F44336;">Ядерная бомба (500⚡)</button>
-    </div>
+    <footer>
+        <p>⚠️ Внимание! Это сатирический сайт.  продаётся только Анна Викторовна. ⚠️</p>
+        <p>© 2024 FriendMart | Шутка от <ваше имя/ник></p>
+    </footer>
 
     <script>
-        // Настройка Firebase (замените на свои данные!)
-        const firebaseConfig = {
-            apiKey: "AIzaSyDZ6jKuP7lLtL1JYQJvJv7q3QkX1X1X1X1",
-            authDomain: "smeshariki-war.firebaseapp.com",
-            databaseURL: "https://smeshariki-war-default-rtdb.firebaseio.com",
-            projectId: "smeshariki-war",
-            storageBucket: "smeshariki-war.appspot.com",
-            messagingSenderId: "1234567890",
-            appId: "1:1234567890:web:abcdef123456"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
-
-        // Инициализация игры
-        const canvas = document.getElementById("gameCanvas");
-        const ctx = canvas.getContext("2d");
-        let gameId, playerId, isHost = false;
-
-        // Масштабирование для мобильных
-        function resizeCanvas() {
-            const scale = Math.min(window.innerWidth / 800, window.innerHeight / 600);
-            canvas.style.width = (800 * scale) + "px";
-            canvas.style.height = (600 * scale) + "px";
-        }
-        resizeCanvas();
-        window.addEventListener("resize", resizeCanvas);
-
-        // Игровые объекты
-        const players = {};
-        const units = [];
-        const explosions = [];
-
-        // Создание/подключение к игре
-        document.getElementById("createBtn").addEventListener("click", () => {
-            gameId = document.getElementById("gameId").value || Math.random().toString(36).substring(7);
-            playerId = "player1";
-            isHost = true;
-            players[playerId] = { x: 100, y: 300, resources: 1000, baseHealth: 1000 };
-            database.ref(`games/${gameId}`).set({ players, units: [], explosions: [] });
-            startGame();
+        // Добавляем реакцию на кнопку "Купить"
+        document.querySelectorAll('.buy-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                alert('Спасибо за покупку! Ваш раб будет доставлен... ✅');
+            });
         });
-
-        document.getElementById("joinBtn").addEventListener("click", () => {
-            gameId = document.getElementById("gameId").value;
-            playerId = "player2";
-            players[playerId] = { x: 700, y: 300, resources: 1000, baseHealth: 1000 };
-            database.ref(`games/${gameId}/players/${playerId}`).set(players[playerId]);
-            startGame();
-        });
-
-        // Запуск игры
-        function startGame() {
-            document.getElementById("ui").style.display = "none";
-            
-            // Слушаем изменения в БД
-            database.ref(`games/${gameId}`).on("value",snapshot => {
-                const data = snapshot.val();
-                Object.assign(players, data.players);
-                units.length = 0;
-                units.push(...data.units || []);
-                explosions.length = 0;
-                explosions.push(...data.explosions || []);
-            });
-
-            // Кнопки юнитов
-            document.querySelectorAll(".unit-btn").forEach(btn => {
-                btn.addEventListener("click", () => {
-                    if (players[playerId].resources >= 100) {
-                        players[playerId].resources -= 100;
-                        const unitType = btn.getAttribute("data-unit");
-                        units.push({
-                            x: players[playerId].x,
-                            y: players[playerId].y,
-                            owner: playerId,
-                            type: unitType,
-                            health: 100,
-                            target: playerId === "player1" ? { x: 700, y: 300 } : { x: 100, y: 300 }
-                        });
-                        database.ref(`games/${gameId}/units`).set(units);
-                    }
-                });
-            });
-
-            // Ядерная бомба
-            document.getElementById("nukeBtn").addEventListener("click", () => {
-                if (players[playerId].resources >= 500) {
-                    players[playerId].resources -= 500;
-                    const target = playerId === "player1" ? { x: 700, y: 300 } : { x: 100, y: 300 };
-                    explosions.push({ x: target.x, y: target.y, radius: 0, maxRadius: 200, damage: 500 });
-                    database.ref(`games/${gameId}/explosions`).set(explosions);
-                }
-            });
-
-            // Игровой цикл
-            function gameLoop() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                
-                // Рисуем базы
-                for (const pid in players) {
-                    const p = players[pid];
-                    ctx.fillStyle = pid === "player1" ? "#FF0000" : "#0000FF";
-                    ctx.fillRect(p.x - 50, p.y - 50, 100, 100);
-                    ctx.fillStyle = "#000";
-                    ctx.fillText(`⚡${p.resources} | ❤${p.baseHealth}`, p.x - 40, p.y - 60);
-                }
-                
-                // Рисуем юнитов
-                units.forEach(unit => {
-                    ctx.fillStyle = unit.owner === "player1" ? "#FF0000" : "#0000FF";
-                    ctx.beginPath();
-                    ctx.arc(unit.x, unit.y, 20, 0, Math.PI * 2);
-                    ctx.fill();
-                    
-                    // Движение к цели
-                    const target = unit.owner === "player1" ? { x: 700, y: 300 } : { x: 100, y: 300 };
-                    const dx = target.x - unit.x;
-                    const dy = target.y - unit.y;
-                    const dist = Math.sqrt(dx * dx + dy * dy);
-                    if (dist > 10) {
-                        unit.x += dx / dist * 2;
-                        unit.y += dy / dist * 2;
-                        database.ref(`games/${gameId}/units`).set(units);
-                    }
-                });
-                
-                // Рисуем взрывы
-                explosions.forEach(exp => {
-                    exp.radius += 5;
-                    ctx.fillStyle = rgba(255, 100, 0, ${1 - exp.radius / exp.maxRadius});
-                    ctx.beginPath();
-                    ctx.arc(exp.x, exp.y, exp.radius, 0, Math.PI * 2);
-                    ctx.fill();
-                    
-                    // Нанесение урона
-                    if (exp.radius >= exp.maxRadius) {
-                        explosions.splice(explosions.indexOf(exp), 1);
-                        database.ref(`games/${gameId}/explosions`).set(explosions);
-                    }
-                });
-                
-                requestAnimationFrame(gameLoop);
-            }
-            gameLoop();
-        }
     </script>
 </body>
 </html>
