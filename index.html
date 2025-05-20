@@ -1,121 +1,121 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Школа 80 — Биржа рабов</title>
+    <title>Интерактивное видео</title>
     <style>
-        body {
-            font-family: 'Comic Sans MS', cursive, sans-serif;
-            background-color: #f0f8ff;
+        * {
             margin: 0;
-            padding: 20px;
-            text-align: center;
+            padding: 0;
+            box-sizing: border-box;
         }
-        header {
-            background-color: #ff6b6b;
-            color: white;
-            padding: 10px;
-            border-radius: 10px;
-            margin-bottom: 20px;
+
+        body {
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+            cursor: grab;
+            user-select: none;
         }
-        .friend-card {
-            background: white;
-            border: 2px dashed #ff6b6b;
-            border-radius: 15px;
-            padding: 15px;
-            margin: 10px;
-            width: 250px;
-            display: inline-block;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+
+        body:active {
+            cursor: grabbing;
         }
-        .friend-img {
-            width: 200px;
-            height: 200px;
+
+        #video-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+        }
+
+        #video-bg {
+            width: 100%;
+            height: 100%;
             object-fit: cover;
-            border-radius: 50%;
-            border: 3px solid #ff6b6b;
+            display: block;
         }
-        .buy-btn {
-            background: #ff6b6b;
+
+        .footer {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
             color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        .buy-btn:hover {
-            background: #ff4757;
-        }
-        footer {
-            margin-top: 30px;
             font-size: 12px;
-            color: gray;
+            text-shadow: 1px 1px 2px black;
+        }
+
+        .footer a {
+            color: white;
+            text-decoration: none;
         }
     </style>
 </head>
 <body>
-    <header>
-        <h1>🛒 School 80 — Магазин рабов 🛒</h1>
-        <p>«Более 1000 человек уже воспользовались нашим сервисом»</p>
-    </header>
-
-    <div id="friends-container">
-        <!-- Друг 1 -->
-        <div class="friend-card">
-            <!-- ВСТАВЬ ССЫЛКУ НА ФОТО -->
-            <img src="https://iimg.su/i/L64oCt" class="friend-img" alt="Друг 1">
-            <h3>👑 Аристархус 👑</h3>
-            <p><strong>Характеристики:</strong></p>
-            <ul style="text-align: left;">
-                <li>Шутит 24/7 (даже невпопад)</li>
-                <li>Знает все тренды TikTok</li>
-                <li>Круто срёт</li>
-            </ul>
-            <button class="buy-btn">Купить за 999 ₽</button>
-        </div>
-
-        <!-- Друг 2 -->
-        <div class="friend-card">
-            <!-- ВСТАВЬ ССЫЛКУ НА ФОТО -->
-            <img src="https://via.placeholder.com/200" class="friend-img" alt="Друг 2">
-            <h3>☕ Кофейный наркоман ☕</h3>
-            <p><strong>Характеристики:</strong></p>
-            <ul style="text-align: left;">
-                <li>Будит вас в 6 утра ради латте</li>
-                <li>Знает все кофейни в радиусе 100 км</li>
-                <li>Говорит «Это не зависимость, это любовь»</li>
-            </ul>
-            <button class="buy-btn">Купить за 799 ₽</button>
-        </div>
-
-        <!-- Друг 3 -->
-        <div class="friend-card">
-            <!-- ВСТАВЬ ССЫЛКУ НА ФОТО -->
-            <img src="https://via.placeholder.com/200" class="friend-img" alt="Друг 3">
-            <h3>🎮 Геймер-полуночник 🎮</h3>
-            <p><strong>Характеристики:</strong></p>
-            <ul style="text-align: left;">
-                <li>Играет в 5 играх одновременно</li>
-                <li>Кричит в микрофон в 3 часа ночи</li>
-                <li>Говорит «Ещё один раунд!» уже 6 часов</li>
-            </ul>
-            <button class="buy-btn">Купить за 1299 ₽</button>
-        </div>
+    <!-- Видео, которое будем перематывать -->
+    <div id="video-container">
+        <video id="video-bg" preload="auto" playsinline>
+            <!-- ВСТАВЬ СВОЮ ССЫЛКУ НА ВИДЕО -->
+            <source src="https://embed.wave.video/3d59QCcUbtjx7paF" type="video/mp4">
+            Ваш браузер не поддерживает видео.
+        </video>
     </div>
 
-    <footer>
-        <p>⚠️ Внимание! Это сатирический сайт.  продаётся только Анна Викторовна. ⚠️</p>
-        <p>© 2024 FriendMart | Шутка от <ваше имя/ник></p>
-    </footer>
+    <div class="footer">
+        <a href="#" target="_blank">made by you</a>
+    </div>
 
+    <!-- Скрипт для перемотки видео курсором -->
     <script>
-        // Добавляем реакцию на кнопку "Купить"
-        document.querySelectorAll('.buy-btn').forEach(button => {
-            button.addEventListener('click', () => {
-                alert('Спасибо за покупку! Ваш раб будет доставлен... ✅');
-            });
+        const video = document.getElementById('video-bg');
+        let isDragging = false;
+        let startX = 0;
+        let currentTime = 0;
+
+        // Ждём загрузки метаданных видео
+        video.addEventListener('loadedmetadata', function() {
+            video.pause(); // Начинаем с паузы
+        });
+
+        // Начало перетягивания
+        document.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            startX = e.clientX;
+            currentTime = video.currentTime;
+        });
+
+        // Движение мыши (перемотка)
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            
+            const dragDistance = e.clientX - startX;
+            const timeChange = (dragDistance / window.innerWidth) * video.duration;
+            video.currentTime = Math.max(0, Math.min(video.duration, currentTime + timeChange));
+        });
+
+        // Конец перетягивания
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+
+        // Для мобильных устройств (тач-события)
+        document.addEventListener('touchstart', (e) => {
+            isDragging = true;
+            startX = e.touches[0].clientX;
+            currentTime = video.currentTime;
+        });
+
+        document.addEventListener('touchmove', (e) => {
+            if (!isDragging) return;
+            
+            const dragDistance = e.touches[0].clientX - startX;
+            const timeChange = (dragDistance / window.innerWidth) * video.duration;
+            video.currentTime = Math.max(0, Math.min(video.duration, currentTime + timeChange));
+        });
+
+        document.addEventListener('touchend', () => {
+            isDragging = false;
         });
     </script>
 </body>
