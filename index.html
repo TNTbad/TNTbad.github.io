@@ -45,25 +45,15 @@
             font-size: 12px;
             text-shadow: 1px 1px 2px black;
         }
-
-        .footer a {
-            color: white;
-            text-decoration: none;
-        }
     </style>
 </head>
 <body>
-    <!-- Видео, которое будем перематывать -->
     <div id="video-container">
         <video id="video-bg" preload="auto" playsinline>
-            <!-- ВСТАВЬ СВОЮ ССЫЛКУ НА ВИДЕО -->
-            <source src="https://embed.wave.video/3d59QCcUbtjx7paF" type="video/mp4">
+            <!-- Используйте прямую ссылку на видеофайл -->
+            <source src="https://drive.google.com/file/d/13yaQDCbcG7H87h8T1ZpKitDgJBzx7XtH/view?usp=drivesdk" type="video/mp4">
             Ваш браузер не поддерживает видео.
         </video>
-    </div>
-
-    <div class="footer">
-        <a href="#" target="_blank">made by you</a>
     </div>
 
     <!-- Скрипт для перемотки видео курсором -->
@@ -73,9 +63,18 @@
         let startX = 0;
         let currentTime = 0;
 
-        // Ждём загрузки метаданных видео
+        // Принудительно устанавливаем продолжительность видео
         video.addEventListener('loadedmetadata', function() {
-            video.pause(); // Начинаем с паузы
+            video.pause();
+            // Если видео не загружает продолжительность автоматически
+            if(isNaN(video.duration) {
+                video.duration = 10; // Установите реальную длительность вашего видео
+            }
+        });
+
+        // Обработка ошибок загрузки видео
+        video.addEventListener('error', function() {
+            console.error("Ошибка загрузки видео");
         });
 
         // Начало перетягивания
@@ -99,7 +98,7 @@
             isDragging = false;
         });
 
-        // Для мобильных устройств (тач-события)
+        // Для мобильных устройств
         document.addEventListener('touchstart', (e) => {
             isDragging = true;
             startX = e.touches[0].clientX;
