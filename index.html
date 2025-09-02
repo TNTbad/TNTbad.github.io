@@ -657,28 +657,20 @@
                 <div class="news-container">
                     <h3>Последние новости клуба</h3>
                     
-                    <!-- МЕСТО ДЛЯ НОВОСТЕЙ КЛУБА -->
-                    <!-- Добавляйте новости в этот раздел -->
-                   <div class="news-item">
-                        <div class="news-date">2 сентября 2025</div>
-                        <h4 class="news-title">открыт набор в наш клуб "agora"</h4>
-                        <p>Ждём новичков и желаем им удачи!</p>
-                   </div>
-                    
                     <div class="news-item">
-                        <div class="news-date">1 сентября 2025</div>
+                        <div class="news-date">1 сентября 2024</div>
                         <h4 class="news-title">Добро пожаловать в новую версию Agora!</h4>
                         <p>Запущена обновленная платформа для наших дискуссий и обучения.</p>
                     </div>
                     
                     <div class="news-item">
-                        <div class="news-date">15 августа 2025</div>
+                        <div class="news-date">15 августа 2024</div>
                         <h4 class="news-title">Расширена библиотека формул</h4>
                         <p>Добавлены новые разделы по физике, химии и высшей математике.</p>
                     </div>
                     
                     <div class="news-item">
-                        <div class="news-date">5 августа 2025</div>
+                        <div class="news-date">5 августа 2024</div>
                         <h4 class="news-title">Обновлен раздел "Советник"</h4>
                         <p>Теперь с поддержкой современных AI-технологий для помощи в обучении.</p>
                     </div>
@@ -756,29 +748,30 @@
                             <i class="fas fa-calculator" style="color: var(--accent-gold); font-size: 2rem;"></i>
                             <h3 class="subject-title">Калькуляторы</h3>
                         </div>
-             <!-- Раздел: Советник -->
-<section id="advisor-content" class="content-section" style="display: none;">
-    <h2>Советник</h2>
-    
-    <div class="ai-container">
-        <h3>Искусственный интеллект для помощи в обучении</h3>
-        
-        <div class="ai-chat" id="aiChat">
-            <div class="ai-message">
-                Добро пожаловать! Я ваш цифровой помощник. Задайте мне вопрос по математике, физике или другому предмету.
-            </div>
-        </div>
-        
-        <div class="ai-input-container">
-            <input type="text" class="ai-input" id="aiInput" placeholder="Задайте ваш вопрос...">
-            <button class="ai-send" onclick="sendAIQuestion()">Отправить</button>
-        </div>
-    </div>
-</section>
                         <p>Инструменты для вычислений</p>
                     </div>
                 </div>
-            
+            </section>
+
+            <!-- Раздел: Советник -->
+            <section id="advisor-content" class="content-section" style="display: none;">
+                <h2>Советник</h2>
+                
+                <div class="ai-container">
+                    <h3>Искусственный интеллект для помощи в обучении</h3>
+                    
+                    <div class="ai-chat" id="aiChat">
+                        <div class="ai-message">
+                            Добро пожаловать! Я ваш цифровой помощник. Задайте мне вопрос по математике, физике или другому предмету.
+                        </div>
+                    </div>
+                    
+                    <div class="ai-input-container">
+                        <input type="text" class="ai-input" id="aiInput" placeholder="Задайте ваш вопрос...">
+                        <button class="ai-send" onclick="sendAIQuestion()">Отправить</button>
+                    </div>
+                </div>
+            </section>
         </main>
     </div>
 
@@ -791,6 +784,10 @@
     </div>
 
     <script>
+        // ===== КОНСТАНТЫ API =====
+        const API_KEY = 'sk-8ae84573c9bd437aae0b6928e955c345';
+        const API_URL = 'https://api.openai.com/v1/chat/completions';
+
         // ===== СИСТЕМА АУТЕНТИФИКАЦИИ =====
         const validUsers = ['Aristarchus', 'Antonius', 'Artemidos'];
         const correctPassword = 'CogitoErgoSum';
@@ -801,16 +798,11 @@
             const errorElement = document.getElementById('errorMessage');
 
             if (validUsers.includes(username) && password === correctPassword) {
-                // Успешный вход
                 document.getElementById('login-page').style.display = 'none';
                 document.getElementById('main-app').style.display = 'block';
                 document.getElementById('current-user').textContent = username;
-                
-                // Показываем раздел по умолчанию
                 showSection('acropolis');
-                
             } else {
-                // Неверные данные
                 errorElement.style.display = 'block';
                 document.getElementById('username').value = '';
                 document.getElementById('password').value = '';
@@ -829,20 +821,14 @@
 
         // ===== СИСТЕМА НАВИГАЦИИ =====
         function showSection(sectionId) {
-            // Скрываем все разделы
             document.querySelectorAll('.content-section').forEach(section => {
                 section.style.display = 'none';
             });
             
-            // Убираем активный класс у всех кнопок
             document.querySelectorAll('.nav-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
-            
-            // Показываем нужный раздел
             document.getElementById(`${sectionId}-content`).style.display = 'block';
-            
-            // Активируем нужную кнопку
             document.querySelector(`[data-section="${sectionId}"]`).classList.add('active');
         }
 
@@ -899,9 +885,84 @@
         }
 
         function searchFormulas(term) {
-            // Здесь будет реализация поиска по всем формулам
             console.log('Поиск:', term);
-            // В реальной реализации здесь будет поиск по базе формул
+        }
+
+        // ===== СОВЕТНИК (ИИ) =====
+        async function sendAIQuestion() {
+            const input = document.getElementById('aiInput');
+            const question = input.value.trim();
+            const chat = document.getElementById('aiChat');
+            
+            if (!question) return;
+            
+            chat.innerHTML += `
+                <div class="ai-message user-message">
+                    <strong>Вы:</strong> ${question}
+                </div>
+            `;
+            
+            input.value = '';
+            
+            chat.innerHTML += `
+                <div class="ai-message">
+                    <strong>Советник:</strong> Думаю...
+                </div>
+            `;
+            chat.scrollTop = chat.scrollHeight;
+            chat.scrollTop = chat.scrollHeight;
+            
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${API_KEY}`
+                    },
+                    body: JSON.stringify({
+                        model: 'gpt-3.5-turbo',
+                        messages: [
+                            {
+                                role: 'system',
+                                content: 'Ты помощник в учебе. Отвечай точно и по делу. Помогай с математикой, физикой, химией и другими предметами.'
+                            },
+                            {
+                                role: 'user',
+                                content: question
+                            }
+                        ],
+                        max_tokens: 500,
+                        temperature: 0.7
+                    })
+                });
+                
+                const data = await response.json();
+                
+                chat.removeChild(chat.lastChild);
+                
+                if (data.choices && data.choices[0]) {
+                    const answer = data.choices[0].message.content;
+                    chat.innerHTML += `
+                        <div class="ai-message">
+                            <strong>Советник:</strong> ${answer}
+                        </div>
+                    `;
+                } else {
+                    throw new Error('Неверный ответ от API');
+                }
+                
+            } catch (error) {
+                chat.removeChild(chat.lastChild);
+                
+                chat.innerHTML += `
+                    <div class="ai-message">
+                        <strong>Советник:</strong> Ошибка подключения. Проверьте API ключ и подключение к интернету.
+                    </div>
+                `;
+                console.error('Ошибка:', error);
+            }
+            
+            chat.scrollTop = chat.scrollHeight;
         }
 
         // ===== ЗАГРУЗКА КОНТЕНТА ПРЕДМЕТОВ =====
@@ -929,7 +990,6 @@
                         ${createFormulaItem('x₁ + x₂ = -b/a', 'Теорема Виета: сумма корней')}
                         ${createFormulaItem('x₁ * x₂ = c/a', 'Теорема Виета: произведение корней')}
                     </div>
-
                     <div class="formula-section">
                         <h3 class="section-title">Прогрессии</h3>
                         ${createFormulaItem('aₙ = a₁ + (n-1)d', 'n-й член арифметической прогрессии')}
@@ -1006,7 +1066,7 @@
                         ${createFormulaItem('1/F = 1/f + 1/d', 'Формула тонкой линзы')}
                     </div>
                 </div>
-            `;
+                `;
             document.getElementById('modal-content').innerHTML = content;
         }
 
@@ -1078,7 +1138,7 @@
                         ${createFormulaItem('Уровень инфляции = (ИПЦ₁ - ИПЦ₀)/ИПЦ₀ * 100%', 'Расчет уровня инфляции')}
                     </div>
                 </div>
-            `;
+                `;
             document.getElementById('modal-content').innerHTML = content;
         }
 
@@ -1118,7 +1178,7 @@
                         <div class="calculator-card">
                             <h3 class="calculator-title">Закон Ома</h3>
                             <input type="number" class="calc-input" placeholder="Напряжение (В)" id="voltage">
-                            <input type="number" class="calc-input" placeholder="Сопротивление (Ом)" id="resistance">
+                                                        <input type="number" class="calc-input" placeholder="Сопротивление (Ом)" id="resistance">
                             <button class="calc-btn" onclick="calculateCurrent()">Вычислить силу тока</button>
                             <div class="calc-result" id="currentResult"></div>
                         </div>
@@ -1242,90 +1302,6 @@
             const M = m / n;
             document.getElementById('molarResult').textContent = `Молярная масса: ${M.toFixed(4)} г/моль`;
         }
-
-        // ===== СОВЕТНИК (ИИ) =====
-const API_KEY = 'sk-8ae84573c9bd437aae0b6928e955c345';
-const API_URL = 'https://api.openai.com/v1/chat/completions';
-
-async function sendAIQuestion() {
-    const input = document.getElementById('aiInput');
-    const question = input.value.trim();
-    const chat = document.getElementById('aiChat');
-    
-    if (!question) return;
-    
-    // Добавляем вопрос пользователя
-    chat.innerHTML += `
-        <div class="ai-message user-message">
-            <strong>Вы:</strong> ${question}
-        </div>
-    `;
-    
-    // Очищаем поле ввода
-    input.value = '';
-    
-    // Показываем индикатор загрузки
-    chat.innerHTML += `
-        <div class="ai-message">
-            <strong>Советник:</strong> Думаю...
-        </div>
-    `;
-    chat.scrollTop = chat.scrollHeight;
-    
-    try {
-        const response = await fetch(API_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${API_KEY}`
-            },
-            body: JSON.stringify({
-                model: 'gpt-3.5-turbo',
-                messages: [
-                    {
-                        role: 'system',
-                        content: 'Ты помощник в учебе. Отвечай точно и по делу. Помогай с математикой, физикой, химией и другими предметами.'
-                    },
-                    {
-                        role: 'user',
-                        content: question
-                    }
-                ],
-                max_tokens: 500,
-                temperature: 0.7
-            })
-        });
-        
-        const data = await response.json();
-        
-        // Удаляем индикатор загрузки
-        chat.removeChild(chat.lastChild);
-        
-        if (data.choices && data.choices[0]) {
-            const answer = data.choices[0].message.content;
-            chat.innerHTML += `
-                <div class="ai-message">
-                    <strong>Советник:</strong> ${answer}
-                </div>
-            `;
-        } else {
-            throw new Error('Неверный ответ от API');
-        }
-        
-    } catch (error) {
-        // Удаляем индикатор загрузки
-        chat.removeChild(chat.lastChild);
-        
-        chat.innerHTML += `
-            <div class="ai-message">
-                <strong>Советник:</strong> Ошибка подключения. Проверьте API ключ и подключение к интернету.
-            </div>
-        `;
-        console.error('Ошибка:', error);
-    }
-    
-    chat.scrollTop = chat.scrollHeight;
-}
 
         // ===== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ =====
         function copyFormula(button) {
