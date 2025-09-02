@@ -661,7 +661,7 @@
                     <!-- Добавляйте новости в этот раздел -->
                    <div class="news-item">
                         <div class="news-date">2 сентября 2025</div>
-                        <h4 class="news-title">открыт набор в наш клуб agora"</h4>
+                        <h4 class="news-title">открыт набор в наш клуб "agora"</h4>
                         <p>Ждём новичков и желаем им удачи!</p>
                    </div>
                     
@@ -756,39 +756,29 @@
                             <i class="fas fa-calculator" style="color: var(--accent-gold); font-size: 2rem;"></i>
                             <h3 class="subject-title">Калькуляторы</h3>
                         </div>
+             <!-- Раздел: Советник -->
+<section id="advisor-content" class="content-section" style="display: none;">
+    <h2>Советник</h2>
+    
+    <div class="ai-container">
+        <h3>Искусственный интеллект для помощи в обучении</h3>
+        
+        <div class="ai-chat" id="aiChat">
+            <div class="ai-message">
+                Добро пожаловать! Я ваш цифровой помощник. Задайте мне вопрос по математике, физике или другому предмету.
+            </div>
+        </div>
+        
+        <div class="ai-input-container">
+            <input type="text" class="ai-input" id="aiInput" placeholder="Задайте ваш вопрос...">
+            <button class="ai-send" onclick="sendAIQuestion()">Отправить</button>
+        </div>
+    </div>
+</section>
                         <p>Инструменты для вычислений</p>
                     </div>
                 </div>
-            </section>
-
-            <!-- Раздел: Советник -->
-            <section id="advisor-content" class="content-section" style="display: none;">
-                <h2>Советник</h2>
-                
-                <div class="ai-container">
-                    <h3>Искусственный интеллект для помощи в обучении</h3>
-                    
-                    <div class="ai-chat" id="aiChat">
-                        <div class="ai-message">
-                            Добро пожаловать! Я ваш цифровой помощник. Задайте мне вопрос по математике, физике или другому предмету.
-                        </div>
-                    </div>
-                    
-                    <div class="ai-input-container">
-                        <input type="text" class="ai-input" id="aiInput" placeholder="Задайте ваш вопрос...">
-                        <button class="ai-send" onclick="sendAIQuestion()">Отправить</button>
-                    </div>
-                    
-                    <!-- МЕСТО ДЛЯ API КЛЮЧА -->
-                    <!-- Замените YOUR_API_KEY на ваш реальный API ключ от выбранного AI-сервиса -->
-                    <div style="margin-top: 20px; padding: 15px; background: rgba(0,0,0,0.2); border-radius: 8px;">
-                        <small>
-                            <strong>Настройка API:</strong> Для работы Советника необходим API ключ. 
-                            Замените <code>sk-8ae84573c9bd437aae0b6928e955c345</code> в коде на ваш действительный ключ от выбранного AI-сервиса.
-                        </small>
-                    </div>
-                </div>
-            </section>
+            
         </main>
     </div>
 
@@ -1254,34 +1244,88 @@
         }
 
         // ===== СОВЕТНИК (ИИ) =====
-        function sendAIQuestion() {
-            const input = document.getElementById('aiInput');
-            const question = input.value.trim();
-            const chat = document.getElementById('aiChat');
-            
-            if (!question) return;
-            
-            // Добавляем вопрос пользователя
+const API_KEY = 'sk-8ae84573c9bd437aae0b6928e955c345';
+const API_URL = 'https://api.openai.com/v1/chat/completions';
+
+async function sendAIQuestion() {
+    const input = document.getElementById('aiInput');
+    const question = input.value.trim();
+    const chat = document.getElementById('aiChat');
+    
+    if (!question) return;
+    
+    // Добавляем вопрос пользователя
+    chat.innerHTML += `
+        <div class="ai-message user-message">
+            <strong>Вы:</strong> ${question}
+        </div>
+    `;
+    
+    // Очищаем поле ввода
+    input.value = '';
+    
+    // Показываем индикатор загрузки
+    chat.innerHTML += `
+        <div class="ai-message">
+            <strong>Советник:</strong> Думаю...
+        </div>
+    `;
+    chat.scrollTop = chat.scrollHeight;
+    
+    try {
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${API_KEY}`
+            },
+            body: JSON.stringify({
+                model: 'gpt-3.5-turbo',
+                messages: [
+                    {
+                        role: 'system',
+                        content: 'Ты помощник в учебе. Отвечай точно и по делу. Помогай с математикой, физикой, химией и другими предметами.'
+                    },
+                    {
+                        role: 'user',
+                        content: question
+                    }
+                ],
+                max_tokens: 500,
+                temperature: 0.7
+            })
+        });
+        
+        const data = await response.json();
+        
+        // Удаляем индикатор загрузки
+        chat.removeChild(chat.lastChild);
+        
+        if (data.choices && data.choices[0]) {
+            const answer = data.choices[0].message.content;
             chat.innerHTML += `
-                <div class="ai-message user-message">
-                    <strong>Вы:</strong> ${question}
+                <div class="ai-message">
+                    <strong>Советник:</strong> ${answer}
                 </div>
             `;
-            
-            // Очищаем поле ввода
-            input.value = '';
-            
-            // Имитируем ответ ИИ (в реальной реализации здесь будет API вызов)
-            setTimeout(() => {
-                chat.innerHTML += `
-                    <div class="ai-message">
-                        <strong>Советник:</strong> Это интересный вопрос! Для полного ответа мне нужен доступ к AI API. 
-                        Замените YOUR_API_KEY в коде на действительный ключ для подключения к сервису искусственного интеллекта.
-                    </div>
-                `;
-                chat.scrollTop = chat.scrollHeight;
-            }, 1000);
+        } else {
+            throw new Error('Неверный ответ от API');
         }
+        
+    } catch (error) {
+        // Удаляем индикатор загрузки
+        chat.removeChild(chat.lastChild);
+        
+        chat.innerHTML += `
+            <div class="ai-message">
+                <strong>Советник:</strong> Ошибка подключения. Проверьте API ключ и подключение к интернету.
+            </div>
+        `;
+        console.error('Ошибка:', error);
+    }
+    
+    chat.scrollTop = chat.scrollHeight;
+}
 
         // ===== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ =====
         function copyFormula(button) {
